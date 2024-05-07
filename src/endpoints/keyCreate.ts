@@ -2,7 +2,15 @@ import {
   OpenAPIRoute,
   OpenAPIRouteSchema,
 } from "@cloudflare/itty-router-openapi";
-import { Key } from "../types";
+
+import { Key, Env } from "../types";
+
+const randomBytes = (len = 32) => {
+  const byteArray = new Uint8Array(len);
+  crypto.getRandomValues(byteArray);
+
+  return byteArray.buffer;
+};
 
 export class KeyCreate extends OpenAPIRoute {
   static schema: OpenAPIRouteSchema = {
@@ -24,23 +32,26 @@ export class KeyCreate extends OpenAPIRoute {
 
   async handle(
     request: Request,
-    env: any,
+    env: Env,
     context: any,
-    data: Record<string, any>
+    data: Record<string, any>,
   ) {
-    // Retrieve the validated request body
-    const { username, publicKey } = data.body;
+    const userId = randomBytes(32);
 
-    // Implement your own object insertion here
+    // Retrieve the validated request body
+    const { publicKey } = data.body;
+
+    const info = await env.DB.prepare(
+      "INSERT INTO keystore (id, publicKey) VALUES (?1, ?2)",
+    )
+      .bind(userId, publicKey)
+      .run();
 
     // return the new key
     return {
       success: true,
-      key: {
-        username,
-        publicKey,
-        created: Date.now()
-      },
+      info,
+      meta: info.meta,
     };
   }
 }

@@ -3,6 +3,11 @@ name = "api"
 main = "src/index.ts"
 compatibility_date = "2024-04-23"
 
+[[d1_databases]]
+binding = "DB" # i.e. available in your Worker on env.DB
+database_name = "keystore-d1"
+database_id = "61c62f1b-13cc-4a89-bec3-8afd89a773a0"
+
 # Automatically place your workloads in an optimal location to minimize latency.
 # If you are running back-end logic in a Worker, running it closer to your back-end infrastructure
 # rather than the end user may result in better performance.
